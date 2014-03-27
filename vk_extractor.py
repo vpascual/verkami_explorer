@@ -49,9 +49,9 @@ def parseProject(project):
       project['current_amount'] = current_amount.strong.contents[0].encode('utf-8')
     
     if total_amount is not None:
-      project['total_amount'] = total_amount.strong.content
+      project['total_amount'] = total_amount.strong.contents[0].encode('utf-8')
       
-      projects.append(project)
+    projects.append(project)
   # print(json.dumps(projects))  
   
   # project['tags'] = categorization.find(("div", { "class" : "tags" }))

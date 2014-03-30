@@ -24,9 +24,23 @@ def parseProject(project):
   if boxa is not None:
     categorization = boxa.find("div", { "class" : "categorization clearfix" })
     current_amount = boxa.find("div", { "class" : "current_amount"})
+
+    if current_amount is not None:
+      project['current_amount'] = current_amount.strong.contents[0].encode('utf-8')
+
     total_amount = boxa.find("div", { "class" : "total_amount"})
+
+    if total_amount is not None:
+      project['total_amount'] = total_amount.strong.contents[0].encode('utf-8')
+
     time_left = boxa.find("div", { "class" : "time_left"})
     project['time_left'] = time_left.strong.contents[0].encode('utf-8')
+
+    description = pSoup.find("div", { "class" : "text"})
+
+    if description is not None:
+      project['description'] = str(description)
+
 
       # if div['class'] == 'tags':
       #   tags = div.findAll("a")
@@ -44,12 +58,6 @@ def parseProject(project):
       
       for tag in tags.findAll('a'):
         project['tags'].append(tag.contents[0].encode('utf-8'))
-      
-    if current_amount is not None:
-      project['current_amount'] = current_amount.strong.contents[0].encode('utf-8')
-    
-    if total_amount is not None:
-      project['total_amount'] = total_amount.strong.contents[0].encode('utf-8')
       
     projects.append(project)
   # print(json.dumps(projects))  
@@ -94,4 +102,4 @@ if __name__ == "__main__":
     nexturl = getProjectsFromUrl(url)
     url = mainUrl + nexturl
 
-  writeFile('verkami_projets.json', json.dumps(projects))
+  writeFile('verkami_projects.json', json.dumps(projects))

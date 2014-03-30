@@ -12,8 +12,8 @@ angular.module('verkamiExplorerApp', [
         resolve: {
           data: ['$http', function($http) {
             return $http.get('data/verkami_projects.json').then(function(response) {
-              console.log(response.data)
-              // return d3.csv.parse(response.data);
+              // console.log(response.data)
+              return response.data;
             })
           }
           ]

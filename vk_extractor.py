@@ -1,6 +1,8 @@
 import urllib2
 import json
 from bs4 import BeautifulSoup as Soup
+import time
+import sys
 
 # mainUrl = 'http://www.verkami.com/browse?page=2'
 mainUrl = 'http://www.verkami.com'
@@ -51,7 +53,11 @@ def parseProject(project):
       #       project['tags'] = project['tags'] + ',' + tag.contents  
     
     if categorization is not None:
-      project['category'] = categorization.find(("div", { "class" : "category" })).strong.a.contents[0].encode('utf-8')
+      try:
+        project['category'] = categorization.find(("div", { "class" : "category" })).strong.a.contents[0].encode('utf-8')
+      except AttributeError:
+        project['category'] = 'None'
+
       tags = categorization.findAll(("div", { "class" : "tags" }))
       tags = tags[1]
       project['tags'] = []
@@ -102,4 +108,11 @@ if __name__ == "__main__":
     nexturl = getProjectsFromUrl(url)
     url = mainUrl + nexturl
 
-  writeFile('verkami_projects.json', json.dumps(projects))
+  if len(projects):
+    obj = {}
+    obj['update_time'] = time.strftime("%c")
+    obj['vk_projects'] = projects
+
+    writeFile('verkami_projects.json', json.dumps(obj))
+  else:
+    sys.error("Couldn't find any project in " + mainUrl)

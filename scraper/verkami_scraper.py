@@ -39,10 +39,9 @@ def parseProject(project):
     time_left = boxa.find("div", { "class" : "time_left"})
     project['time_left'] = time_left.strong.contents[0]
 
-    description = pSoup.find("div", { "class" : "text"})
-
-    if description is not None:
-      project['description'] = str(description)
+    #description = pSoup.find("div", { "class" : "text"})
+    #if description is not None:
+    #  project['description'] = str(description)
 
     if categorization is not None:
       try:

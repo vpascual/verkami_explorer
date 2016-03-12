@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 #coding=utf8
 
-import urllib2
+import requests
 from bs4 import BeautifulSoup as Soup
 import time
 import scraperwiki
-import json
 
 mainUrl = 'http://www.verkami.com'
 nextPage = ''
@@ -20,13 +19,21 @@ def getNextPage(soup):
   return ''
 
 def parseProject(project):
-  pHandler = urllib2.urlopen(project['url']).read()
+  pHandler = requests.get(project['url']).content
   pSoup = Soup(pHandler, "lxml")
 
   boxa = pSoup.find("div", { "class" : "boxA portlet_project_summary" })
   if boxa is not None:
     categorization = boxa.find("div", { "class" : "categorization clearfix" })
     current_amount = boxa.find("div", { "class" : "current_amount"})
+    title = boxa.find("h2", {"class" : "sectitle"})
+    location = boxa.find("div", { "class" : "location"})
+
+    if title is not None:
+      project['title'] = title.strong.contents[0]
+
+    if location is not None:
+      project['location'] = location.strong.a.contents[0]
 
     if current_amount is not None:
       project['current_amount'] = current_amount.strong.contents[0]
@@ -35,6 +42,8 @@ def parseProject(project):
 
     if total_amount is not None:
       project['total_amount'] = total_amount.strong.contents[0]
+
+
 
     time_left = boxa.find("div", { "class" : "time_left"})
     project['time_left'] = time_left.strong.contents[0]
@@ -51,20 +60,22 @@ def parseProject(project):
 
       tags = categorization.findAll(("div", { "class" : "tags" }))
       tags = tags[1]
-      project['tags'] = []
+      tags_array = []
 
       for tag in tags.findAll('a'):
-        project['tags'].append(tag.contents[0])
+        tags_array.append(tag.contents[0])
+
+      project['tags'] = ';'.join(tags_array)
 
     project['update_time'] = time.strftime("%Y-%m-%d %H:%M")
 
-    print(json.dumps(project))
-    # scraperwiki.sql.save(unique_keys=[project['id'] + "_" + str(int(time.time()))], data=project)
+    #print(json.dumps(project))
+    scraperwiki.sql.save(unique_keys=[project['id'] + "_" + str(int(time.time()))], data=project)
 
 # get the main info from a project, specially its url
 def getProjectsFromUrl(url):
   print("Processing Verkami URL " + url)
-  handler = urllib2.urlopen(url).read()
+  handler = requests.get(url).content
   soup = Soup(handler,  "lxml")
   project_list = soup.find("div", { "class" : "boxA projects_preview_list" })
   uls = project_list.findAll("ul")

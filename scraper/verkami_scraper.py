@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup as Soup
 import time
 import scraperwiki
+import json
 
 mainUrl = 'http://www.verkami.com'
 nextPage = ''
@@ -28,6 +29,7 @@ def parseProject(project):
     current_amount = boxa.find("div", { "class" : "current_amount"})
     title = boxa.find("h2", {"class" : "sectitle"})
     location = boxa.find("div", { "class" : "location"})
+    user = boxa.find("div", { "class" : "metadata"})
 
     if title is not None:
       project['title'] = title.strong.contents[0]
@@ -42,6 +44,10 @@ def parseProject(project):
 
     if total_amount is not None:
       project['total_amount'] = total_amount.strong.contents[0]
+
+    if user is not None:
+      project['user_name'] = user.a.strong.contents[0]      
+      project['user_url'] = user.a['href']
 
 
 

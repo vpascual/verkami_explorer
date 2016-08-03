@@ -101,3 +101,4 @@ if __name__ == "__main__":
   while (url != mainUrl):
     nexturl = getProjectsFromUrl(url)
     url = mainUrl + nexturl
+
